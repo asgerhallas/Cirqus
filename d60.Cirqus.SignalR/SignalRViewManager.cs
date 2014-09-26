@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using d60.Cirqus.Events;
 using d60.Cirqus.Views.ViewManagers;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Infrastructure;
 
 namespace d60.Cirqus.SignalR
 {
@@ -12,10 +14,12 @@ namespace d60.Cirqus.SignalR
     /// <typeparam name="TViewInstance"></typeparam>
     public class SignalRViewManager<TViewInstance> : IViewManager<TViewInstance> where TViewInstance : IViewInstance
     {
+        readonly IConnectionManager _connectionManager;
         readonly IViewManager<TViewInstance> _innerViewManager;
 
-        public SignalRViewManager(IViewManager<TViewInstance> innerViewManager)
+        public SignalRViewManager(IConnectionManager connectionManager, IViewManager<TViewInstance> innerViewManager)
         {
+            _connectionManager = connectionManager;
             _innerViewManager = innerViewManager;
 
             _innerViewManager.Updated += instance =>
@@ -24,6 +28,11 @@ namespace d60.Cirqus.SignalR
 
                 Updated(instance);
             };
+        }
+
+        public SignalRViewManager(IViewManager<TViewInstance> innerViewManager)
+            : this(GlobalHost.ConnectionManager, innerViewManager)
+        {
         }
 
         public long GetPosition(bool canGetFromCache = true)
@@ -55,7 +64,8 @@ namespace d60.Cirqus.SignalR
 
         void PublishUpdatedView(TViewInstance instance)
         {
-            
+            var context = _connectionManager.GetHubContext<CirqusViewManagerHubContext>();
+
         }
     }
 }
