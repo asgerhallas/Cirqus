@@ -55,6 +55,7 @@ namespace d60.Cirqus.SignalR
 
         void PublishUpdatedView(TViewInstance instance)
         {
+            
         }
     }
 }
